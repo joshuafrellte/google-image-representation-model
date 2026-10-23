@@ -1,6 +1,6 @@
 # GIRD process notes
 
-This note follows the study from raw data to deployment. Substeps, problems, solutions, and remarks are recorded only for work completed in this session. Later phases are named so the path stays visible.
+This note follows the study from raw data to deployment. Substeps, problems, solutions, and remarks are recorded only for work completed so far. Later phases are named so the path stays visible.
 
 ## 1. Business understanding
 
@@ -18,7 +18,7 @@ Describe the 196-country image set, its attributes, and the quality of the count
 
 **Solution.** The income file is read as Windows-1252. The urbanization file is read as UTF-8. Taiwan stays in the country table with a blank percent and is left out of the urbanization charts.
 
-**Remarks.** The image-content part of the planned EDA has not been run, because no image file has been collected. After the 196-country filter, the income counts are 25 low, 47 lower-middle, 59 upper-middle, and 65 high. The 2025 median urban shares are 34.5, 50.9, 65.4, and 80.0 percent. The ranges overlap: Liechtenstein, a high-income country, is 14.6 percent urban.
+**Remarks.** A four-country image pilot now exists. The image-content part of the planned EDA has not been run on the full country set. After the 196-country filter, the income counts are 25 low, 47 lower-middle, 59 upper-middle, and 65 high. The 2025 median urban shares are 34.5, 50.9, 65.4, and 80.0 percent. The ranges overlap: Liechtenstein, a high-income country, is 14.6 percent urban.
 
 ## 3. Data preparation
 
@@ -47,13 +47,27 @@ The rule and the list are public:
 
 **Solution.** Kosovo's code is matched to `XKX`. Palestine's query is Palestine. The five inverted short forms are reordered to South Korea, North Korea, The Gambia, The Bahamas, and Federated States of Micronesia. The Republic of the Congo is queried as "Republic of the Congo". Naoero is kept as the query, because that is the cited short form. `world_bank_name` for that row is stored as Nauru.
 
+### Project layout
+
+**Substeps.** Downloaded sources were moved to `data/raw`: the World Bank income file, the urbanization file, and `IndependentStates_Dependencies_INRGGI_08102026.csv`. Derived tables go in `data/processed`. The research note and this note are in `docs`. `main.ipynb` and `collect.py` stay in the project root. Both scripts were pointed at the new folders, and the notebook was run again. It still writes 196 rows to `data/processed/countries.csv`.
+
 ### Image collection
 
-**Substeps.** `collect.py` is written to search Malawi, Kenya, Brazil, and Japan through SerpApi, drop flags, maps, coats of arms, and encyclopedia results, keep 10 photos, and send those photos to Cloud Vision for three labels. `.gitignore` excludes `.env`.
+**Substeps.** `collect.py` searches Malawi, Kenya, Brazil, and Japan through SerpApi, one country from each income group. It drops a result when the title, source, or URL matches flag, coat of arms, emblem, map, locator, encyclopedia, or `.svg`, keeps 10 photos, and sends those photos to Cloud Vision label detection for three labels. The kept rows are `data/processed/images_pilot.csv`. The dropped rows are `data/processed/excluded_pilot.csv`. `.gitignore` excludes `.env`.
 
-**Problem.** Google blocked creation of a service-account key on this account, so there is no JSON credential file. The API key that replaced it reached Cloud Vision, and Vision then refused the call: the billing account is closed and is not in good standing until a one-time payment of at least US$30 is credited. The pilot did not produce `data/processed/images_pilot.csv`.
+The pilot run kept 10 photos for each country. It excluded 5 Malawi results, 3 Kenya results, 4 Brazil results, and 0 Japan results: 40 kept rows and 12 excluded rows.
 
-**Solution.** Vision is called with `GOOGLE_API_KEY` from `.env`. The key is not printed. The billing block is not solved. The account has to show an active status, project `1065567207889` has to be linked to it, and `python collect.py` has to be run again. SerpApi did accept the Malawi search, so that half of the pilot does not need to be rebuilt. The photo filter and the label step have not been checked on real results.
+**Problem.** Google blocked creation of a service-account key, so there is no JSON credential file. The first API key reached Cloud Vision, and Vision then refused the call because billing account `01383E-E18BE8-6ECF90` was closed and not in good standing. Reopen stayed disabled until a one-time payment of US$30 was credited. A new billing account was created during setup. The account already there was equally new, so the extra account did not change the payment requirement, and it was not used. The health-check list on the billing account was budget alerts, extra viewers, extra administrators, and an unlinked project. Those notices were not the payment. The original project, number `1065567207889`, had Cloud Vision enabled and no linked billing account.
+
+**Solution.** The US$30 payment was made on 23 October 2026 and appears as a credit on **My GIRD Vision Billing Account**. After that account showed Open, a new Cloud project was created for GIRD, number `759289031035`, and linked to it. Cloud Vision was enabled there, and a new API key restricted to Cloud Vision replaced `GOOGLE_API_KEY` in `.env`. The key is not printed. `python collect.py` then completed the four-country pilot.
+
+**Remarks.** The keyword filter runs before Cloud Vision. The three labels describe what is visible in the photo. They are stored as `dominant_label_1`, `dominant_label_2`, and `dominant_label_3`, and they are not used to decide whether the photo shows that country. A kept row means Google ranked it for the country name and the title or URL passed the keyword filter. The same filter can drop a photograph when the page title contains "Map" or "Flag". A links-only reading of `images_pilot.csv` also glues the following columns onto the URL, so the pilot photos were checked from local copies instead.
+
+### Pilot review sheet
+
+**Substeps.** `review.py` reads `data/processed/images_pilot.csv` and makes no SerpApi or Cloud Vision calls. It saves each photo under `data/processed/review/images` and writes `data/processed/review/index.html`. Each card shows the local photo, the country, the search rank, the labels, and a link that contains only the image URL. All 40 photos were saved. Empty labels are left blank.
+
+**Remarks.** All 40 local photos were reviewed by hand and accepted.
 
 ## 4. Modeling
 
