@@ -1,0 +1,3 @@
+country_name,world_bank_name,iso_code,region,development_status,income_status_binary,actual_urban_population_pct,urban_year,image_url,search_rank,raw_search_rank,dominant_label_1,dominant_label_2,dominant_label_3,review_reason
+Palestine,West Bank and Gaza,PSE,"Middle East, North Africa, Afghanistan & Pakistan",Lower middle income,Low or lower-middle,87.3818963,2025.0,"https://media.newyorker.com/photos/65304499e129bd34403a2f88/3:4/w_1278,h_1704,c_limit/Chotiner-Palestians-in-Israel-Site-Social.jpg",10,15,,,,blank labels
+South Sudan,South Sudan,SSD,Sub-Saharan Africa,Low income,Low or lower-middle,21.6843599,2025.0,https://2021-2025.state.gov/wp-content/uploads/2023/07/shutterstock_1860859741v2.jpg,7,11,,,,blank labels

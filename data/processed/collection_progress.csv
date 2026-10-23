@@ -1,0 +1,197 @@
+iso_code,country_name,kept,excluded
+AFG,Afghanistan,10,3
+BFA,Burkina Faso,10,12
+BDI,Burundi,10,12
+CAF,Central African Republic,10,12
+TCD,Chad,10,23
+COD,Democratic Republic of the Congo,10,10
+ERI,Eritrea,10,7
+ETH,Ethiopia,10,7
+GNB,Guinea-Bissau,10,8
+LBR,Liberia,10,10
+MDG,Madagascar,10,1
+MWI,Malawi,10,5
+MLI,Mali,10,6
+MOZ,Mozambique,10,5
+NER,Niger,10,42
+PRK,North Korea,10,5
+RWA,Rwanda,10,3
+SLE,Sierra Leone,10,9
+SOM,Somalia,10,6
+SSD,South Sudan,10,8
+SDN,Sudan,10,21
+SYR,Syria,10,5
+GMB,The Gambia,10,8
+UGA,Uganda,10,16
+YEM,Yemen,10,3
+AGO,Angola,10,5
+BGD,Bangladesh,10,7
+BEN,Benin,10,5
+BTN,Bhutan,10,0
+BOL,Bolivia,10,4
+MMR,Burma,10,13
+KHM,Cambodia,10,5
+CMR,Cameroon,10,10
+COM,Comoros,10,6
+CIV,Côte d'Ivoire,10,8
+DJI,Djibouti,10,6
+EGY,Egypt,10,2
+SWZ,Eswatini,10,4
+GHA,Ghana,10,7
+GIN,Guinea,10,56
+HTI,Haiti,10,3
+HND,Honduras,10,8
+IND,India,10,12
+KEN,Kenya,10,3
+KIR,Kiribati,10,7
+KGZ,Kyrgyzstan,10,5
+LAO,Laos,10,12
+LBN,Lebanon,10,3
+LSO,Lesotho,10,8
+MRT,Mauritania,10,4
+MAR,Morocco,10,2
+NAM,Namibia,10,3
+NPL,Nepal,10,2
+NIC,Nicaragua,10,3
+NGA,Nigeria,10,7
+PAK,Pakistan,10,7
+PSE,Palestine,10,5
+PNG,Papua New Guinea,10,7
+COG,Republic of the Congo,10,39
+STP,Sao Tome and Principe,10,5
+SEN,Senegal,10,4
+SLB,Solomon Islands,10,4
+TJK,Tajikistan,10,6
+TZA,Tanzania,10,3
+TLS,Timor-Leste,10,8
+TGO,Togo,10,8
+TUN,Tunisia,10,3
+UZB,Uzbekistan,10,3
+VUT,Vanuatu,10,3
+VEN,Venezuela,10,7
+ZMB,Zambia,10,3
+ZWE,Zimbabwe,10,7
+ALB,Albania,10,3
+DZA,Algeria,10,6
+ARG,Argentina,10,2
+ARM,Armenia,10,6
+AZE,Azerbaijan,10,10
+BLR,Belarus,10,6
+BLZ,Belize,10,2
+BIH,Bosnia and Herzegovina,10,10
+BWA,Botswana,10,3
+BRA,Brazil,10,4
+CPV,Cabo Verde,10,6
+CHN,China,10,3
+COL,Colombia,10,3
+CUB,Cuba,10,4
+DMA,Dominica,10,2
+DOM,Dominican Republic,10,5
+ECU,Ecuador,10,4
+SLV,El Salvador,10,8
+GNQ,Equatorial Guinea,10,16
+FSM,Federated States of Micronesia,10,22
+FJI,Fiji,10,2
+GAB,Gabon,10,5
+GEO,Georgia,10,3
+GRD,Grenada,10,4
+GTM,Guatemala,10,2
+IDN,Indonesia,10,9
+IRN,Iran,10,10
+IRQ,Iraq,10,11
+JAM,Jamaica,10,2
+JOR,Jordan,10,27
+KAZ,Kazakhstan,10,6
+XKX,Kosovo,10,5
+LBY,Libya,10,12
+MYS,Malaysia,10,4
+MDV,Maldives,10,0
+MHL,Marshall Islands,10,3
+MUS,Mauritius,10,3
+MEX,Mexico,10,4
+MDA,Moldova,10,23
+MNG,Mongolia,10,5
+MNE,Montenegro,10,3
+MKD,North Macedonia,10,6
+PRY,Paraguay,10,3
+PER,Peru,10,6
+PHL,Philippines,10,5
+LCA,Saint Lucia,10,3
+VCT,Saint Vincent and the Grenadines,10,4
+WSM,Samoa,10,5
+SRB,Serbia,10,6
+ZAF,South Africa,10,2
+LKA,Sri Lanka,10,6
+SUR,Suriname,10,7
+THA,Thailand,10,2
+TON,Tonga,10,5
+TUR,Turkey,10,34
+TKM,Turkmenistan,10,4
+TUV,Tuvalu,10,11
+UKR,Ukraine,10,3
+VNM,Vietnam,10,4
+AND,Andorra,10,3
+ATG,Antigua and Barbuda,10,3
+AUS,Australia,10,7
+AUT,Austria,10,3
+BHR,Bahrain,10,2
+BRB,Barbados,10,4
+BEL,Belgium,10,7
+BRN,Brunei,10,15
+BGR,Bulgaria,10,7
+CAN,Canada,10,3
+CHL,Chile,10,15
+CRI,Costa Rica,10,1
+HRV,Croatia,10,2
+CYP,Cyprus,10,3
+CZE,Czechia,10,4
+DNK,Denmark,10,4
+EST,Estonia,10,3
+FIN,Finland,10,3
+FRA,France,10,3
+DEU,Germany,10,4
+GRC,Greece,10,2
+GUY,Guyana,10,11
+HUN,Hungary,10,7
+ISL,Iceland,10,2
+IRL,Ireland,10,2
+ISR,Israel,10,10
+ITA,Italy,10,3
+JPN,Japan,10,0
+KWT,Kuwait,10,5
+LVA,Latvia,10,3
+LIE,Liechtenstein,10,6
+LTU,Lithuania,10,3
+LUX,Luxembourg,10,4
+MLT,Malta,10,1
+MCO,Monaco,10,1
+NRU,Naoero,10,6
+NLD,Netherlands,10,6
+NZL,New Zealand,10,9
+NOR,Norway,10,1
+OMN,Oman,10,1
+PLW,Palau,10,8
+PAN,Panama,10,5
+POL,Poland,10,2
+PRT,Portugal,10,2
+QAT,Qatar,10,12
+ROU,Romania,10,7
+RUS,Russia,10,8
+KNA,Saint Kitts and Nevis,10,8
+SMR,San Marino,10,3
+SAU,Saudi Arabia,10,6
+SYC,Seychelles,10,1
+SGP,Singapore,10,2
+SVK,Slovakia,10,4
+SVN,Slovenia,10,0
+KOR,South Korea,10,2
+ESP,Spain,10,4
+SWE,Sweden,10,16
+CHE,Switzerland,10,0
+TWN,Taiwan,10,25
+BHS,The Bahamas,10,10
+TTO,Trinidad and Tobago,10,11
+ARE,United Arab Emirates,10,9
+GBR,United Kingdom,10,32
+USA,United States,10,175
+URY,Uruguay,10,4
