@@ -28116,7 +28116,7 @@
 
     Promise.all([
       fetch(new URL("../images.csv", document.baseURI)),
-      fetch(new URL("../excluded.csv", document.baseURI)),
+      fetch(new URL("excluded.csv", document.baseURI)),
       fetch(new URL("../countries.csv", document.baseURI))
     ]).then(async (responses) => {
       if (responses.some((response) => !response.ok)) {

@@ -1,6 +1,6 @@
 """Collect Google Images for every country in the country table.
 
-Writes data/processed/images.csv and data/processed/excluded.csv.
+Writes data/processed/images.csv and data/processed/review/excluded.csv.
 Does not read or write the pilot files. A country is recorded in
 data/processed/collection_progress.csv only after its search finishes,
 so a later run skips countries that already spent SerpApi and Cloud Vision calls.
@@ -23,10 +23,10 @@ import collect
 
 ROOT = Path(__file__).resolve().parent
 IMAGES_PATH = ROOT / "data" / "processed" / "images.csv"
-EXCLUDED_PATH = ROOT / "data" / "processed" / "excluded.csv"
+EXCLUDED_PATH = ROOT / "data" / "processed" / "review" / "excluded.csv"
 PROGRESS_PATH = ROOT / "data" / "processed" / "collection_progress.csv"
-FLAG_PATH = ROOT / "data" / "processed" / "flag_review.csv"
-BLANK_PATH = ROOT / "data" / "processed" / "blank_label_review.csv"
+FLAG_PATH = ROOT / "data" / "processed" / "review" / "flag_review.csv"
+BLANK_PATH = ROOT / "data" / "processed" / "review" / "blank_label_review.csv"
 EXPECTED_COUNTRIES = 196
 IMAGE_COLUMNS = [
     "country_name",

@@ -8,7 +8,7 @@ import pandas as pd
 
 ROOT = Path(__file__).resolve().parent
 IMAGES_PATH = ROOT / "data" / "processed" / "images.csv"
-EXCLUDED_PATH = ROOT / "data" / "processed" / "excluded.csv"
+EXCLUDED_PATH = ROOT / "data" / "processed" / "review" / "excluded.csv"
 COUNTRIES_PATH = ROOT / "data" / "processed" / "countries.csv"
 SHEET_PATH = ROOT / "data" / "processed" / "review" / "index.html"
 LABEL_COLUMNS = ("dominant_label_1", "dominant_label_2", "dominant_label_3")
@@ -492,7 +492,7 @@ __CARDS__
 
     Promise.all([
       fetch(new URL("../images.csv", document.baseURI)),
-      fetch(new URL("../excluded.csv", document.baseURI)),
+      fetch(new URL("excluded.csv", document.baseURI)),
       fetch(new URL("../countries.csv", document.baseURI))
     ]).then(async (responses) => {
       if (responses.some((response) => !response.ok)) {

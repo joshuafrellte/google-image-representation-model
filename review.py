@@ -7,7 +7,7 @@ import pandas as pd
 import requests
 
 ROOT = Path(__file__).resolve().parent
-PILOT_PATH = ROOT / "data" / "processed" / "images_pilot.csv"
+PILOT_PATH = ROOT / "data" / "processed" / "pilot" / "images_pilot.csv"
 REVIEW_DIR = ROOT / "data" / "processed" / "review"
 IMAGE_DIR = REVIEW_DIR / "images"
 SHEET_PATH = REVIEW_DIR / "index.html"

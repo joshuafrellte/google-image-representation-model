@@ -19,8 +19,8 @@ import requests
 ROOT = Path(__file__).resolve().parent
 ENV_PATH = ROOT / ".env"
 COUNTRIES_PATH = ROOT / "data" / "processed" / "countries.csv"
-IMAGES_PATH = ROOT / "data" / "processed" / "images_pilot.csv"
-EXCLUDED_PATH = ROOT / "data" / "processed" / "excluded_pilot.csv"
+IMAGES_PATH = ROOT / "data" / "processed" / "pilot" / "images_pilot.csv"
+EXCLUDED_PATH = ROOT / "data" / "processed" / "pilot" / "excluded_pilot.csv"
 PILOT_ISO_CODES = ("MWI", "KEN", "BRA", "JPN")
 KEEP_PER_COUNTRY = 10
 DROP_RULES = (

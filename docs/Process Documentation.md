@@ -225,13 +225,25 @@ An activity or a discipline, rather than a scene: `Aerospace Engineering`, `Camp
 
 A compound or a proper name. The lists keep the general word and were not extended to every compound: `Bridge` is kept and these bridge types are not, `Wall` is kept and `Stone wall` is not, `Village` is kept and `Mountain Village` is not, `House` is kept and `Mansion` is not, `Mountain` is kept and `Alps` is not, `Cobblestone` is kept and `Flagstone` is not. The words left off are `Alps`, `Arch bridge`, `Cable-stayed bridge`, `Flagstone`, `Mansion`, `Mountain Village`, `Stone wall`, `Tied-arch bridge`.
 
+### Where the side lists are
+
+The pilot tables are now in `data/processed/pilot/`. The drop log and the hand lists, `excluded.csv`, `flag_review.csv`, `blank_label_review.csv`, and `missing_label_review.csv`, are now in `data/processed/review/` next to the review page. `countries.csv`, `images.csv`, and `collection_progress.csv` stay in `data/processed/`. Model scores are in `data/processed/modeling/model_results.csv`. The collection write-ups above keep the paths they were written with.
+
 ## 4. Modeling
 
-Not started. The planned comparison is Decision Tree, Random Forest, and multinomial Logistic Regression, for the four-tier income target and the binary target, with the preprocessing grid and a country-level 80/20 split.
+**Substeps.** `main.ipynb` predicts income from `dominant_label_1`, `dominant_label_2`, `dominant_label_3`, `scene_category`, `has_urban_elements`, and `has_natural_landmark`. The urban percent, region, and `representation_mismatch` are not features. One 80/20 split of countries, stratified on the four-tier income group with `random_state=42`, is shared by both targets. It holds out 40 countries: 5 low, 10 lower-middle, 12 upper-middle, and 13 high. The other 156 countries, 1,560 photos, are the training set. Inside those countries, 5-fold grouped cross-validation selects the setting. The folds are built on the four-tier label and reused for the binary target.
+
+Stage 1 uses default hyperparameters. It crosses listwise deletion, most-frequent imputation, and a `no-label` placeholder with one-hot or ordinal encoding and with no scaling, min-max, or standardization. Each of those 18 preprocessors is fit for a decision tree, a random forest of 100 trees, and multinomial logistic regression: 54 settings for each target, 108 in all. Stage 2 keeps the winning preprocessor of each algorithm. It tunes tree `max_depth` in {4, 8, unlimited} and `min_samples_leaf` in {1, 5}, forest `max_depth` in {8, unlimited} and `min_samples_leaf` in {1, 5}, and logistic `C` in {0.1, 1, 10}. The best setting for each target is refit on the training countries and scored once on the held-out countries. The country counts at each cut, the five training groups, and the derivation of the 108 and 26 settings are in the Modeling section of the research note. Scores, the chosen settings, and training permutation importance are in `data/processed/modeling/model_results.csv`.
+
+**Problem.** Listwise deletion removes a photo when any of the six predictors is blank. Twenty-nine photos are in that state. The other two treatments keep them: most-frequent imputation fills a blank from the training fold, and the placeholder writes `no-label` in a blank label or scene and 0 in a blank flag. Fifteen logistic fits did not converge within 1,000 iterations. Those fits stayed in the comparison.
+
+**Solution.** The four-tier winner is a decision tree with the `no-label` placeholder, one-hot encoding, and no scaling, at the default depth and leaf size (`max_depth` unlimited, `min_samples_leaf` 1). Its cross-validation macro F1 is 0.336. On the 400 held-out photos the macro F1 is 0.341, precision 0.346, and recall 0.346. The binary winner is logistic regression with most-frequent imputation, one-hot encoding, no scaling, and `C` 1. Its cross-validation macro F1 is 0.630. On the same 400 photos the macro F1 is 0.599, precision 0.648, and recall 0.603. Neither winner uses listwise deletion, so none of the 29 blank-predictor photos are removed from those two scores. On the training photos, permuting a column drops the four-tier macro F1 most for `dominant_label_1` (0.408), then `dominant_label_2` (0.353), `dominant_label_3` (0.257), and `scene_category` (0.186). The two flags move it by about 0.03. For the binary model the three labels move the training macro F1 by 0.110, 0.074, and 0.055, and the scene and the flags move it by about 0.002.
+
+**Remarks.** The confusion matrices are in the modeling section of `main.ipynb`. The mismatch ranking has not been started.
 
 ## 5. Evaluation
 
-Not started. The planned measures are macro-averaged precision, recall, and F1, plus a confusion matrix for the best model in each target, and a country ranking by representational mismatch.
+The classification scores and the two confusion matrices are recorded in the modeling section. The country ranking by representational mismatch has not been started. `representation_mismatch` is still unset.
 
 ## 6. Deployment
 
