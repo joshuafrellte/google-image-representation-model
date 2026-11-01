@@ -65,7 +65,7 @@ The pilot run kept 10 photos for each country. It excluded 5 Malawi results, 3 K
 
 The three labels are a fixed choice, held for every photo. They are the strongest three Vision returned. The scene is the first of them that names a scene, so a later word is not used once an earlier one has named it. On the full sheet, 449 photos still receive a scene from a later label after a word such as Blue or Sky is skipped. One label would miss those photos. Three labels already produce 331 photos whose labels name more than one scene. `has_urban_elements` and `has_natural_landmark` record that. A longer list would change those flags more often than it would change `scene_category`. The confidence scores were not saved, so stopping at three is not a numeric cutoff. Three was not compared with one label or with a longer list.
 
-Ten photographs are the sample of what a searcher sees on the first screen without scrolling. That screen is a few dozen thumbnails. A large share of them are maps, flags, and reference images rather than photographs of the country. Ten kept photographs is a conservative cut of what remains, at the low end of the roughly 10 to 12 photographs expected there. The sheet keeps people, wildlife, and landmarks. The same count for every country makes a City share a count out of 10. The free allowances on SerpApi and Cloud Vision are why the count was not higher. A round 10 left room for the refills the filter required. The ten are the first ten that pass the filter, so a country whose early hits are mostly maps, flags, or encyclopedia pages can draw a later-ranked photograph into the set. The mismatch ranking's sensitivity to sampling depth was not measured. Comparing fewer photographs, these ten, and a deeper cut is future work.
+Ten photographs are the sample of what a searcher sees on the first screen without scrolling. That screen is a few dozen thumbnails. A large share of them are maps, flags, and reference images rather than photographs of the country. Ten kept photographs is a conservative cut of what remains, at the low end of the roughly 10 to 12 photographs expected there. The sheet keeps people, wildlife, and landmarks. The same count for every country makes a City share a count out of 10. The free allowances on SerpApi and Cloud Vision are why the count was not higher. A round 10 left room for the refills the filter required. The original plan was one search per country returning 40 images, then filtering those to 10, which is 196 searches and fits one free-tier allowance of 250; before the filter was final, countries left under 10 were searched again, the count ran past 196, a second free-tier account also capped at 250 covered those refills, and collection was then changed to keep requesting results until 10 images pass the filter. The ten are the first ten that pass the filter, so a country whose early hits are mostly maps, flags, or encyclopedia pages can draw a later-ranked photograph into the set. The mismatch ranking's sensitivity to sampling depth was not measured. Comparing fewer photographs, these ten, and a deeper cut is future work.
 
 ### Pilot review sheet
 
@@ -251,7 +251,37 @@ Stage 1 uses default hyperparameters. It crosses listwise deletion, most-frequen
 
 The classification scores and the two confusion matrices are recorded in the modeling section. The confusion matrices and the importance chart stay in the notebook until they are exported as image files. The country ranking by representational mismatch is in the Evaluation section of `main.ipynb` and in `data/processed/modeling/mismatch_ranking.csv`. `representation_mismatch` is set on all 1,960 rows of `images.csv`.
 
-One line is fit to all 196 countries, City share on the 2025 urban percent. The slope is 0.002923 City-share per urban percentage point, and the intercept is 0.062747. A country is flagged when the absolute residual is at least 0.20. Thirty-six countries sit above the line, with more City photos than urbanization predicts, and 27 sit below it. The mean signed residual is 0.057 for low income, -0.023 for lower middle income, -0.021 for upper middle income, and 0.013 for high income. The rank correlation of the signed residual with the four-tier income order is -0.045. On the 400 held-out photos, 155 predictions are the correct tier, 160 are wrong by one tier, and 85 are wrong by more than one tier.
+One line is fit to all 196 countries, City share on the 2025 urban percent. The slope is 0.002923 City-share per urban percentage point, and the intercept is 0.062747. A country is flagged when the absolute residual is at least 0.20. Sixty-three countries are flagged: 36 sit above the line, with more City photos than urbanization predicts, and 27 sit below it. The ten largest residuals on each side of the line are listed below. The mean signed residual is 0.057 for low income, -0.023 for lower middle income, -0.021 for upper middle income, and 0.013 for high income. The rank correlation of the signed residual with the four-tier income order is -0.045. On the 400 held-out photos, 155 predictions are the correct tier, 160 are wrong by one tier, and 85 are wrong by more than one tier.
+
+The ten countries with more City photos than the line predicts:
+
+| Country | Urban % | City share | Residual | Income tier |
+| --- | ---: | ---: | ---: | --- |
+| Cameroon | 55.7 | 0.8 | +0.575 | Lower middle income |
+| Qatar | 99.4 | 0.9 | +0.547 | High income |
+| Azerbaijan | 58.6 | 0.7 | +0.466 | Upper middle income |
+| Poland | 60.1 | 0.7 | +0.462 | High income |
+| Nigeria | 63.8 | 0.7 | +0.451 | Lower middle income |
+| Estonia | 70.7 | 0.7 | +0.431 | High income |
+| Taiwan | 78.9 | 0.7 | +0.407 | High income |
+| Kosovo | 50.9 | 0.6 | +0.388 | Upper middle income |
+| United Arab Emirates | 86.0 | 0.7 | +0.386 | High income |
+| Belgium | 87.7 | 0.7 | +0.381 | High income |
+
+The ten countries with fewer City photos than the line predicts:
+
+| Country | Urban % | City share | Residual | Income tier |
+| --- | ---: | ---: | ---: | --- |
+| Naoero | 100.0 | 0.0 | -0.355 | High income |
+| Iceland | 94.2 | 0.0 | -0.338 | High income |
+| Switzerland | 85.7 | 0.0 | -0.313 | High income |
+| Norway | 83.6 | 0.0 | -0.307 | High income |
+| Palau | 79.3 | 0.0 | -0.295 | High income |
+| Marshall Islands | 79.1 | 0.0 | -0.294 | Upper middle income |
+| Brunei | 75.0 | 0.0 | -0.282 | High income |
+| Dominica | 74.0 | 0.0 | -0.279 | Upper middle income |
+| Djibouti | 73.0 | 0.0 | -0.276 | Lower middle income |
+| Iraq | 69.9 | 0.0 | -0.267 | Upper middle income |
 
 The cutoff is 0.20 because each country has 10 photos and City share moves in steps of 0.10. A residual of 0.20 is two photos away from the line. The signed residuals from the fitted line have a mean of 0 and a standard deviation of 0.196, so 0.20 is about one standard deviation from that mean. A country inside that spread is within the ordinary scatter of this sheet. The flag starts at the first whole-photo step of about that size, and a one-photo gap stays unflagged. Half a standard deviation is about 0.10, one photo, and that gap stays inside the scatter. Two standard deviations is about 0.39, roughly four photos, which is already past the ordinary scatter. The flag is the boundary of that scatter, where a usual departure ends. The standard deviation is measured on these same 196 residuals. It describes this sheet. It is not a significance test.
 
