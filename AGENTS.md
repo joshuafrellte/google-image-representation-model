@@ -6,7 +6,7 @@ Read `docs/Process Documentation.md` for the work log and `docs/Data Mining Rese
 
 GIRD asks whether Google Image Search's picture of a country diverges from that country's World Bank urbanization, and whether that divergence lines up with income. The universe is 193 UN members plus Kosovo (XKX), Taiwan (TWN), and Palestine (PSE). Vatican City is out. Twenty-two territories were removed.
 
-`data/processed/images.csv` has 1,960 photos, 10 for each of 196 countries. `scenes.py` has already set `scene_category`, `has_urban_elements`, and `has_natural_landmark`. `representation_mismatch` is set from the City-share line, with a cutoff of 0.20. The ranking is in `data/processed/modeling/mismatch_ranking.csv`. Income models have been fit. The scores are in `data/processed/modeling/model_results.csv`. Deployment has not started.
+`data/processed/images.csv` has 1,960 photos, 10 for each of 196 countries. `scenes.py` has already set `scene_category`, `has_urban_elements`, and `has_natural_landmark`. `representation_mismatch` is set from the City-share line, with a cutoff of 0.20. The ranking is in `data/processed/modeling/mismatch_ranking.csv`. Income models have been fit. The scores are in `data/processed/modeling/model_results.csv`. `python lookup.py` writes `data/processed/lookup/index.html`. Open that file directly.
 
 ## Do not
 
@@ -21,7 +21,7 @@ GIRD asks whether Google Image Search's picture of a country diverges from that 
 
 ## Commands
 
-`python collect_all.py --refill` applies the filter in `collect.py` and does not search. `python collect_all.py --run --refill` searches only countries that have fewer than 10 photos. `python scenes.py` labels scenes from the three stored Vision labels and does not call an API.
+`python collect_all.py --refill` applies the filter in `collect.py` and does not search. `python collect_all.py --run --refill` searches only countries that have fewer than 10 photos. `python scenes.py` labels scenes from the three stored Vision labels and does not call an API. `python lookup.py` writes `data/processed/lookup/index.html` from the ranking, the scene counts, and the importance rows. Open that file directly. It does not call an API.
 
 Search names are the State Department short form, with these exceptions: Türkiye (the stored `country_name`; "Turkey" returns the bird), the query "Jordan country" (the sheet still says Jordan), "Republic of the Congo", Naoero, and Palestine.
 
