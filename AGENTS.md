@@ -6,7 +6,7 @@ Read `docs/Process Documentation.md` for the work log and `docs/Data Mining Rese
 
 GIRD asks whether Google Image Search's picture of a country diverges from that country's World Bank urbanization, and whether that divergence lines up with income. The universe is 193 UN members plus Kosovo (XKX), Taiwan (TWN), and Palestine (PSE). Vatican City is out. Twenty-two territories were removed.
 
-`data/processed/images.csv` has 1,960 photos, 10 for each of 196 countries. `scenes.py` has already set `scene_category`, `has_urban_elements`, and `has_natural_landmark`. `representation_mismatch` is not set. Income models have been fit. The scores are in `data/processed/modeling/model_results.csv`. The mismatch ranking and deployment have not started.
+`data/processed/images.csv` has 1,960 photos, 10 for each of 196 countries. `scenes.py` has already set `scene_category`, `has_urban_elements`, and `has_natural_landmark`. `representation_mismatch` is set from the City-share line, with a cutoff of 0.20. The ranking is in `data/processed/modeling/mismatch_ranking.csv`. Income models have been fit. The scores are in `data/processed/modeling/model_results.csv`. Deployment has not started.
 
 ## Do not
 
@@ -27,4 +27,4 @@ Search names are the State Department short form, with these exceptions: Türkiy
 
 ## Still open
 
-`representation_mismatch` has no cutoff. `data/processed/review/flag_review.csv` is still a hand list, not a drop list. The two blank-label photos, Palestine and South Sudan, stay in `data/processed/review/blank_label_review.csv`. Scene category counts from the last `scenes.py` run are in the process log.
+`representation_mismatch` uses a cutoff of 0.20. `data/processed/review/flag_review.csv` is still a hand list, not a drop list. The two blank-label photos, Palestine and South Sudan, stay in `data/processed/review/blank_label_review.csv`. Scene category counts from the last `scenes.py` run are in the process log.
