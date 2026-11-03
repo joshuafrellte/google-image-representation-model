@@ -15,6 +15,7 @@ IMAGES_PATH = ROOT / "data" / "processed" / "images.csv"
 RESULTS_PATH = ROOT / "data" / "processed" / "modeling" / "model_results.csv"
 PAGE_PATH = ROOT / "data" / "processed" / "lookup" / "index.html"
 SCENE_ORDER = ("City", "Nature", "Landmark", "Culture/People", "Other", "blank")
+ALWAYS_SHOWN = ("City", "Nature", "Landmark", "Culture/People")
 TARGET_LABELS = {
     "development_status": "Four-tier decision tree",
     "income_status_binary": "Binary logistic regression",
@@ -37,11 +38,14 @@ def scene_counts(images):
         for name in group["scene_category"].map(scene_name):
             seen[name] = seen.get(name, 0) + 1
         ordered = []
+        for name in ALWAYS_SHOWN:
+            ordered.append({"scene": name, "count": seen.pop(name, 0)})
         for name in SCENE_ORDER:
-            if name in seen:
+            if seen.get(name, 0) >= 1:
                 ordered.append({"scene": name, "count": seen.pop(name)})
         for name in sorted(seen):
-            ordered.append({"scene": name, "count": seen[name]})
+            if seen[name] >= 1:
+                ordered.append({"scene": name, "count": seen[name]})
         counts[iso_code] = ordered
     return counts
 
@@ -116,11 +120,15 @@ TEMPLATE = """<!DOCTYPE html>
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <title>GIRD country lookup</title>
   <style>
-    body { font-family: sans-serif; margin: 24px; background: #f6f6f6; color: #1a1a1a; }
+    body { font-family: sans-serif; margin: 24px; background: #ececec; color: #1a1a1a; }
     h1 { font-size: 1.4rem; margin: 0 0 8px; }
     h2 { font-size: 1.05rem; margin: 0 0 8px; }
     p { margin: 0 0 8px; }
     .summary, .note { color: #444; font-size: 0.95rem; }
+    .intro { display: flex; justify-content: space-between; align-items: center; gap: 12px 28px; margin-bottom: 8px; }
+    .intro .note { margin: 0; }
+    .legend { display: flex; flex-wrap: wrap; justify-content: flex-end; gap: 6px 14px; margin: 0 0 0 auto; color: #444; font-size: 0.95rem; }
+    .legend span { white-space: nowrap; }
     .layout { display: grid; grid-template-columns: minmax(240px, 320px) 1fr; gap: 16px; align-items: start; margin-top: 16px; }
     .panel { background: #fff; padding: 12px; }
     label { display: block; font-size: 0.75rem; color: #333; margin-bottom: 8px; }
@@ -128,16 +136,25 @@ TEMPLATE = """<!DOCTYPE html>
     #ranking { list-style: none; margin: 0; padding: 0; max-height: 70vh; overflow: auto; }
     #ranking button { font: inherit; text-align: left; width: 100%; padding: 8px; border: 0; border-bottom: 1px solid #eee; background: #fff; cursor: pointer; }
     #ranking button[aria-current="true"] { background: #1a1a1a; color: #fff; }
-    #ranking .flag { color: #163; }
-    #ranking button[aria-current="true"] .flag { color: #d8efe4; }
     #empty { color: #444; }
-    dl { display: grid; grid-template-columns: 11rem 1fr; gap: 6px 12px; margin: 0; }
+    dl { display: grid; grid-template-columns: 14rem 1fr; gap: 6px 12px; margin: 0; }
     dt { color: #444; }
     dd { margin: 0; }
-    .scenes { list-style: none; margin: 0; padding: 0; }
-    .scenes li { display: grid; grid-template-columns: 8.5rem 1.5rem minmax(4rem, 1fr); gap: 8px; align-items: center; margin-bottom: 4px; }
-    .track { display: block; height: 8px; background: #e4e4e4; }
-    .bar { display: block; height: 8px; background: #1a1a1a; }
+    .scene-mix { display: flex; align-items: center; gap: 12px; flex-wrap: wrap; }
+    .pie { width: 7rem; height: 7rem; border-radius: 50%; flex: none; }
+    .scene-key { list-style: none; margin: 0; padding: 0; }
+    .scene-key li { display: grid; grid-template-columns: 0.7rem minmax(0, 1fr) 1.5rem; gap: 6px; align-items: center; margin-bottom: 4px; }
+    .swatch { display: block; width: 0.7rem; height: 0.7rem; }
+    .swatch.city { background: #3d8fd4; }
+    .swatch.nature { background: #0e7034; }
+    .swatch.landmark { background: #d9720b; }
+    .swatch.culture { background: #5e1d78; }
+    .swatch.other { background: #6a6a6a; }
+    .swatch.blank { background: #a8a8a8; }
+    .dot { display: inline-block; width: 0.55rem; height: 0.55rem; border-radius: 50%; margin-right: 0.35rem; vertical-align: 0.1em; }
+    .dot.above { background: #8aafd4; }
+    .dot.below { background: #e7a8a7; }
+    .dot.within { background: #b0b0b0; }
     .importance { margin-top: 16px; }
     .models { display: grid; grid-template-columns: repeat(auto-fit, minmax(240px, 1fr)); gap: 16px; }
     table { width: 100%; border-collapse: collapse; }
@@ -153,6 +170,14 @@ TEMPLATE = """<!DOCTYPE html>
 <body>
   <h1>GIRD country lookup</h1>
   <p class="summary" id="summary"></p>
+  <div class="intro">
+    <p class="note">Predicted income tier is withheld here. This page reports image content against urbanization only, not model predictions.</p>
+    <p class="legend">
+      <span><span class="dot above"></span>At least 0.20 above</span>
+      <span><span class="dot below"></span>At least 0.20 below</span>
+      <span><span class="dot within"></span>Under 0.20</span>
+    </p>
+  </div>
   <div class="layout">
     <section class="panel">
       <label>
@@ -166,7 +191,7 @@ TEMPLATE = """<!DOCTYPE html>
   </div>
   <section class="panel importance">
     <h2>Permutation importance</h2>
-    <p class="note">These drops are from training photos and are not the mismatch score.</p>
+    <p class="note">These drops are from training photos and are not the mismatch score. A larger drop means the model used that feature more.</p>
     <div class="models" id="importance"></div>
   </section>
   <script>
@@ -180,8 +205,8 @@ TEMPLATE = """<!DOCTYPE html>
     let selected = payload.countries[0].iso_code;
 
     document.querySelector("#summary").textContent =
-      summary.flagged + " countries are flagged, " +
-      summary.above + " above the line and " +
+      summary.flagged + " countries are at least 0.20 from the line, " +
+      summary.above + " above it and " +
       summary.below + " below. The score is the signed residual.";
 
     function signed(value) {
@@ -189,21 +214,59 @@ TEMPLATE = """<!DOCTYPE html>
       return value > 0 ? "+" + text : text;
     }
 
+    function place(country) {
+      if (!country.representation_mismatch) return "within";
+      return country.signed_residual < 0 ? "below" : "above";
+    }
+
+    function dot(country) {
+      return "<span class=\\"dot " + place(country) + "\\"></span>";
+    }
+
+    function sceneClass(name) {
+      if (name === "Culture/People") return "culture";
+      if (name === "blank") return "blank";
+      return name.toLowerCase();
+    }
+
+    const SCENE_COLOR = {
+      city: "#3d8fd4",
+      nature: "#0e7034",
+      landmark: "#d9720b",
+      culture: "#5e1d78",
+      other: "#6a6a6a",
+      blank: "#a8a8a8"
+    };
+
+    function pieStyle(scenes) {
+      let cursor = 0;
+      const stops = [];
+      scenes.forEach((scene) => {
+        if (scene.count <= 0) return;
+        const start = cursor * 10;
+        cursor += scene.count;
+        stops.push(SCENE_COLOR[sceneClass(scene.scene)] + " " + start + "% " + (cursor * 10) + "%");
+      });
+      return "conic-gradient(" + stops.join(", ") + ")";
+    }
+
     function scenes(country) {
       const items = country.scenes.map((scene) => {
         const label = scene.scene === "blank" ? "Blank" : scene.scene;
-        const width = scene.count * 10;
-        return "<li><span>" + label + "</span><span>" + scene.count +
-          "</span><span class=\\"track\\"><span class=\\"bar\\" style=\\"width:" + width + "%\\"></span></span></li>";
+        return "<li><span class=\\"swatch " + sceneClass(scene.scene) + "\\"></span><span>" +
+          label + "</span><span>" + scene.count + "</span></li>";
       }).join("");
-      return "<ul class=\\"scenes\\">" + items + "</ul>";
+      return "<div class=\\"scene-mix\\"><div class=\\"pie\\" style=\\"background:" +
+        pieStyle(country.scenes) + "\\" role=\\"img\\" aria-label=\\"Scene mix\\"></div>" +
+        "<ul class=\\"scene-key\\">" + items + "</ul></div>" +
+        "<p class=\\"note\\">Counts are out of 10 photos.</p>";
     }
 
     function renderDetail() {
       const country = payload.countries.find((row) => row.iso_code === selected);
-      const flag = country.representation_mismatch
-        ? "Flagged. The absolute residual is at least 0.20."
-        : "Not flagged. The absolute residual is under 0.20.";
+      const position = country.representation_mismatch
+        ? "At least 0.20 from the line, two photos out of ten. City share moves in steps of 0.10."
+        : "Under 0.20 from the line. That gap stays inside the ordinary scatter.";
       detail.innerHTML =
         "<h2>" + country.country_name + "</h2>" +
         "<dl>" +
@@ -211,10 +274,11 @@ TEMPLATE = """<!DOCTYPE html>
         "<dt>Income group</dt><dd>" + country.development_status + "</dd>" +
         "<dt>Scene counts</dt><dd>" + scenes(country) + "</dd>" +
         "<dt>City share</dt><dd>" + country.city_share.toFixed(1) + "</dd>" +
-        "<dt>Predicted City share</dt><dd>" + country.predicted_city_share.toFixed(3) + "</dd>" +
+        "<dt>Expected City share<br>(from urbanization line)</dt><dd>" + country.predicted_city_share.toFixed(3) + "</dd>" +
         "<dt>Signed residual</dt><dd>" + signed(country.signed_residual) + "</dd>" +
-        "<dt>Mismatch</dt><dd>" + flag + "</dd>" +
-        "</dl>";
+        "<dt>Mismatch</dt><dd>" + dot(country) + position + "</dd>" +
+        "</dl>" +
+        "<p class=\\"note\\">10 photos; small countries' shares are more volatile per photo.</p>";
     }
 
     function renderList() {
@@ -232,8 +296,7 @@ TEMPLATE = """<!DOCTYPE html>
           selected = country.iso_code;
           render();
         });
-        const mark = country.representation_mismatch ? " <span class=\\"flag\\">flagged</span>" : "";
-        button.innerHTML = country.rank + " " + country.country_name + " " + signed(country.signed_residual) + mark;
+        button.innerHTML = country.rank + " " + country.country_name + " " + signed(country.signed_residual) + " " + dot(country);
         item.append(button);
         return item;
       }));
