@@ -1,6 +1,6 @@
 # GIRD process notes
 
-This note follows the study from raw data to deployment. Substeps, problems, solutions, and remarks are recorded only for work completed so far. Later phases are named so the path stays visible.
+This note follows the study from raw data to deployment. Substeps, problems, solutions, and remarks are recorded only for work completed so far. Later phases are named so the path stays visible. The repository is https://github.com/joshuafrellte/google-image-representation-model.git.
 
 ## 1. Business understanding
 
