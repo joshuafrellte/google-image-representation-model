@@ -1,0 +1,431 @@
+
+
+**MAPÚA MALAYAN COLLEGES MINDANAO** 
+
+**_Country Visual Representation vs. Reality: A 2026 Study of Urbanization-Representation_** 
+
+#### **_Mismatch in Google Image Search_** 
+
+
+
+
+
+**Lawagon, Lynn Angela** 
+
+
+
+Bachelor of Science in Computer Science 
+
+Course Adviser 
+
+#### **Prof. Rogelio O. Badiang Jr.** 
+
+College of Computer and Information Science 
+
+# **Introduction** 
+
+Google Image Search functions as a primary, often unquestioned, visual reference for how people around the world picture countries they have never visited. This study tests a common expectation: a search for a wealthy nation such as Germany or Japan returns images dominated by skylines, modern infrastructure, and urban landmarks, and a search for a lower-income nation returns imagery centered on nature, rural life, cultural artifacts, or a single iconic landmark, regardless of that country's actual level of urban development. The question has real social consequences: does the visual representation of a country in search results reflect its actual characteristics, or does it diverge from those characteristics in a way related to income? 
+
+
+
+<!-- Start of picture text -->
+Google ——_camany x $2 &<br>Ss emo eee ola. |<br>ira ey 'g ey Sai ee ,<br>ane ==. a, tae: ae ering ssh<br>et bee FE) naenen ia natsSe ite<br><!-- End of picture text -->
+
+
+
+<!-- Start of picture text -->
+Google Japan 2 BAe e<br>=. ees<br><!-- End of picture text -->
+
+
+
+<!-- Start of picture text -->
+5<br>io}L] a] Felts=bs = es. 5 EE7; Ay _ i<br><!-- End of picture text -->
+
+**Figure 1. The expectation being tested** 
+
+This distinction matters because search-engine imagery is not a neutral mirror of the world. It is the product of what content exists online, what gets indexed, and how ranking systems surface that content. If wealthier nations are consistently shown through their cities while poorer nations are consistently reduced to nature or heritage imagery, independent of their true urbanization levels, then search results may be reinforcing outdated or inaccurate stereotypes about entire regions of the world, shaping perception at a scale few other media formats can match. 
+
+**Research Problem.** The naive framing of this issue, that richer countries are shown as more urban because they are more urbanized, is not by itself a meaningful research question: it may simply restate a real, unremarkable economic fact rather than reveal anything about search-engine behavior. A more precise problem, and the one this study addresses, is whether a country's actual urbanization level (independent of its income classification) is faithfully reflected in its image search representation, or whether representation systematically diverges from that reality in ways correlated with income. 
+
+**Research Gap.** Prior work has documented related forms of wealth-correlated visual bias in adjacent domains; for example, Huang et al. (2025) introduced the FairLocator benchmark and found that AI vision models perform substantially worse at geolocating images from less economically developed and less densely populated regions.  That work, however, evaluates a model's ability to identify where a photo was taken, not what a search engine chooses to display when a country is queried by name. To the knowledge of the researchers, no study has directly examined whether Google Image Search's representation of a country aligns with that country's actual urbanization data at scale, across a large, systematically sampled set of nations. This study addresses that gap. 
+
+### **_Research Objectives._** 
+
+_General Objective:_ To determine whether a country's image representation in Google Image Search results (urban/city vs. nature/cultural/landmark imagery) diverges from its actual level of urbanization, and whether any such divergence is related to the country's income classification. Income is predicted with classification techniques on image-derived content features. That prediction is not the divergence measure, because actual_urban_population_pct is left out of every income model and a predicted tier never sees urbanization. The divergence is ordinary least-squares (OLS) line of City share on the 2025 urban percent, so the image mix is compared with the urban percent directly. 
+
+### **_Specific Objectives:_** 
+
+1. To conduct exploratory data analysis on the dataset, summarizing feature distributions, relationships, and data-quality issues. 
+
+2. To evaluate the effects of different missing-value treatment techniques on model performance. 
+
+3. To evaluate the effects of different feature encoding and scaling techniques on model performance. 
+
+4. To determine the best-performing combination of preprocessing technique and classification algorithm. 
+
+5. To compare model performance when predicting a four-tier income classification versus a binary-collapsed target. 
+
+6. To identify which image content types are most predictive of income classification. 
+
+7. To identify specific countries whose image representation most diverges from their actual urbanization level. 
+
+This study does not claim to establish that any single mechanism, such as Google's ranking algorithm, causes any disparity found. It aims instead to measure, characterize, and document the disparity itself, providing an evidentiary basis for further investigation into its causes. Low-income countries sit about half a photo above the line (mean residual +0.057). The gap is small, and the check in the mismatch results does not support reading it as a reversal of the expectation above. 
+
+# **Methodology** 
+
+This study follows the CRISP-DM (Cross-Industry Standard Process for Data Mining) methodology, organized into six phases. 
+
+## **1. Business Understanding** 
+
+The business problem, reframed for a research context, is to determine whether Google Image Search's representation of countries diverges from those countries' actual urbanization levels, and whether that divergence correlates with income classification. Two tasks operationalize this problem. The classification task predicts a country's income tier from features derived from the content of its search-result images. `actual_urban_population_pct` is left out of every income model, so a predicted tier never sees urbanization and cannot measure a departure from it. The trained model is not the instrument for that comparison. The comparison is an OLS line fit to all 196 countries, City share on the 2025 urban percent. The residual is the observed City share minus the share the line predicts. The line is used because it puts the image mix against the urban percent directly. The study's intended output is threefold: (1) a quantified relationship between image content and income classification, (2) a ranking of countries by how far their City share sits from that line, and (3) a simple prototype through which these findings can be explored. 
+
+## **2. Data Understanding** 
+
+**Dataset.** The Global Image Representation Dataset (GIRD) consists of one record per image, collected for 196 countries (193 UN member states plus Kosovo, Taiwan, and Palestine; Vatican City is excluded due to insufficient World Bank data coverage). The World Bank classification list also includes territories, dependencies, and constituent economies, such as Bermuda, the Cayman Islands, and Hong Kong SAR; those records are filtered out and are not counted among the 196. Ten images are retained per country after filtering, yielding 1,960 image records, well above the 500-record minimum. Ten is a fixed design choice, not a count that was compared with other 
+
+depths. The sample is what a searcher sees on the first screen without scrolling. That screen is a few dozen thumbnails, and a large share of them are maps, flags, and reference images rather than photographs of the country. 
+
+
+
+<!-- Start of picture text -->
+Google span x § ma &<br>eet Gg oe a ee ——<br><!-- End of picture text -->
+
+**Figure 2. What the first screen contains** 
+
+Ten kept photographs is a conservative cut of what remains, at the low end of the roughly 10 to 12 photographs expected there. People, wildlife, and landmarks stay. The same count makes a City share a count out of 10. The free allowances on SerpApi and Cloud Vision are why the count was not higher: a round 10 left room for the refills the filter required. Each SerpApi account used here is free tier, and each allows 250 searches. The original plan was one SerpApi search per country, returning 40 images, then filtering those 40 down to 10. That is 196 searches, inside one allowance of 250. Before the filter was in its final form, countries left under 10 had their images retrieved again, so the searches ran past 196. The first account ran out, and a second free-tier account, also capped at 250, covered those refills. The process note names that second account and the countries it filled. Collection was then changed. It no longer takes a fixed set of 40 and filters afterward. It keeps requesting results until 10 images pass the filter. The ten are the first ten that pass, so a country whose early hits are mostly maps, flags, or encyclopedia pages can draw a later-ranked 
+
+photograph into the set. The mismatch ranking's sensitivity to that depth was not measured. Comparing fewer photographs, these ten, and a deeper cut is future work. 
+
+**Attributes.** Each record includes: country_name (the State Department short-form name used as the Google Images query), world_bank_name (the retained World Bank label), iso_code, region, image_url, search_rank, raw_search_rank, development_status (four-tier World Bank income group), income_status_binary (Low income and Lower middle income collapsed together, versus Upper middle income and High income), actual_urban_population_pct (ground-truth urbanization level), dominant_label_1/2/3 (raw Vision API content labels), scene_category (derived: City, Nature, Landmark, Culture/People, Other), has_urban_elements, has_natural_landmark, and representation_mismatch (an evaluation output only, set when the absolute City-share residual is at least 0.20, and not a model feature). Label detection is requested with maxResults 3. Vision returns those labels in descending confidence order, the code stores that order and does not sort it again, and the confidence scores are not saved. dominant_label_1 is the strongest of the three, and dominant_label_3 is the weakest of the three. A blank later column means Vision returned fewer than three labels. 
+
+**Data Sources.** Images and associated metadata are retrieved via SerpApi's Google Images API. Image content labels are generated via the Google Cloud Vision API. Income classification is sourced from the World Bank’s Country and Lending Groups dataset (World Bank, n.d.-a). Actual urbanization level is sourced from the World Bank’s Urban Population (% of total population) indicator (World Bank, n.d.-b). 
+
+**Initial Exploratory Data Analysis.** The exploratory charts are in main.ipynb. They count the countries in each income group and draw that bar, and they draw box plots of the 2025 urban percent by income group and by region. The scene-mix section counts scenes by income tier and by region, plots each country's share of City photos against its 2025 urban percent, charts the three incomplete-label groups, and charts the 331 photos whose labels name more than one scene. Every country retained 10 photos. 
+
+
+
+<!-- Start of picture text -->
+Countries in each income group<br>80<br>70 65<br>60 59<br>y 20 47<br>g<br>= 40<br>8 30 25<br>20<br>10<br>0 Low Lower-middle Upper-middle High<br>World Bank income group<br><!-- End of picture text -->
+
+**Figure 3. Countries in each income group** 
+
+
+
+<!-- Start of picture text -->
+Urbanization by income group, 2025<br>100<br>S<br>3 80<br>6<br>&<br>s 6<br>s<br>a<br>8<br>c 40<br>Ss<br>5 °<br>8<br>20<br>°<br>Low Lower-middle Upper-middle High<br>World Bank income group<br><!-- End of picture text -->
+
+**Figure 4. Urbanization by income group, 2025** 
+
+
+
+<!-- Start of picture text -->
+Urbanization by region, 2025<br>North America i<br>Middle East, North Africa, Afghanistan & Pakistan o oh——_{| }4<br>Europe & Central Asia 7 © -—{ | +<br>Latin America & Caribbean +——{ | };—4<br>East Asia & Pacific r—{<br>Sub-Saharan Africa rf | -}———4<br>South Asia rf] °<br>20 40 60 80 100<br>Urban population (% of total)<br><!-- End of picture text -->
+
+**Figure 5. Urbanization by region, 2025** 
+
+
+
+<!-- Start of picture text -->
+Scene by income tier<br>350 Scene<br>= Cty<br>@m Nature<br>300 Mm Landmark<br>@™E Culture/People<br>| Other<br>| (blank)<br>250<br>w 200<br>fo}<br>2°<br>&<br>150<br>100<br>50<br>0<br>Low Lower middle" Upper middle, High-<br><!-- End of picture text -->
+
+**Figure 6. Scene by income tier and by region** 
+
+
+
+<!-- Start of picture text -->
+Scene by region<br>Sub-Saharan Africa<br>South Asia<br>North America Scene<br>mm City<br>mE Nature<br>Middle East, North Africa, Afghanistan & Pakistan fmm Landmark<br>MEE Culture/People<br>mE Other<br>Latin America & Caribbean = (blank)<br>Europe & Central Asia<br>East Asia & Pacific<br>0 50 100 150 200 250<br>Photos<br><!-- End of picture text -->
+
+**Figure 7. Scene by region** 
+
+
+
+<!-- Start of picture text -->
+1,931 photos have all three labels<br>20.0<br>18<br>17.5<br>15.0<br>8 12.5<br>E 10.0 9<br>75<br>5.0<br>25 2<br>0.0 Missing- only label 3 Missing labels 2 and 3 No labels<br><!-- End of picture text -->
+
+**Figure 8. Photos with all three labels** 
+
+
+
+<!-- Start of picture text -->
+331 photos name more than one scene<br>Nature and City 159<br>City and Landmark 48<br>Culture/People and Landmark 41<br>Nature and Landmark 34<br>Culture/People and City 24<br>Three scenes 16<br>Culture/People and Nature 9<br>0 2 50 75 100 125 150 175<br>Photos.<br><!-- End of picture text -->
+
+**Figure 9. 331 photos name more than one scene** 
+
+## **3. Data Preparation** 
+
+**Project files.** main.ipynb holds the country table, the exploratory charts, and the classifiers. collect.py is the closed four-country pilot. collect_all.py is the 196-country collection and the refill that applies the same filter. scenes.py turns the three Vision labels into scene_category, has_urban_elements, and has_natural_landmark. data/raw holds the World Bank and State Department sources. data/processed/countries.csv and data/processed/images.csv are the tables the models read. The closed pilot tables are in data/processed/pilot/. The drop log and the hand lists are in data/processed/review/. Model scores are written to data/processed/modeling/model_results.csv. The country ranking is data/processed/modeling/mismatch_ranking.csv. 
+
+**Data Cleaning.** One filter decides whether a search result is kept, and every excluded result is logged. Before Cloud Vision, the title, source, and image address drop flags, coats of arms, emblems, maps, locators, encyclopedia thumbnails, and SVG files. An image address is a map when it contains the word map, including when an underscore or hyphen is glued to it, or when it contains bbcmp_, country_profile, or harita, even if Vision later describes the picture as scenery. After labeling, a photo is dropped when any label is Map, Atlas, Advertising, Graphic design, 
+
+Hoodie, Film, Fictional character, Fungus, Macro photography, or Guinea pig, when every label is a flag word or those words plus Wind, or when the URL is on the reviewed collision list. A flag stays when another label describes a person, crowd, protest, or place. Photographs of places, people, wildlife, and landscape stay. A second crop of the same National Geographic file is dropped. Blank-label rows are listed for review rather than dropped. Countries left under 10 are filled from the next unused results with that same filter. images.csv has 1,960 photos, 10 per country. A browser failure to display the remote URL does not drop a row that Vision has already labeled. 
+
+**Analysis set.** After a review of excluded.csv, those rows were left unchanged. The keyword filter and the Vision rules are the inclusion rule for the 1,960-photo analysis set. The keyword step reads the page title and the source together with the image address, so it can drop a high-ranking photograph before Cloud Vision runs. Checked cases include the Dhaka night view, which Vision later labeled City, Urban area, and Building, and the Abidjan skyline, labeled Sky, Skyscraper, and Urban area. Both stayed in excluded.csv. 
+
+
+
+<!-- Start of picture text -->
+Mia aren WE i pata t oe tel ih cana<br>Fpen ibe Whine Mae a =<br>+<br>' ae a Yo ea c Wes haa ines<br>i y a aan<br>‘ a "a?<br>Th<br><!-- End of picture text -->
+
+
+
+<!-- Start of picture text -->
+le , r<br>nage — ~ os$<br>an<br>aes ee ee | ceil = ep<br>cc ot<br>2 2<br><!-- End of picture text -->
+
+**Figure 10. Photographs the keyword filter dropped** 
+
+Restoring them, and removing a kept photo so the country remained at 10, was rejected: that would replace the filtered search ranking with a judgment about which pictures ought to represent the country. An earlier human decision is different and remains in force. Maps, flag graphics, film stills, name collisions, and duplicates were removed because they are not photographs of the queried country, the same rule was applied to every country, and each open slot was filled by the next search result that passed that rule. Removing the keyword filter and recollecting was also rejected. The Vision rules do not replace it: a map can be labeled as scenery, and a flag stays when another label describes a person, crowd, protest, or place, so the ten photos kept for a country would change. Missed high-ranking photographs are a limitation of the sample. 
+
+**Scene fields.** scenes.py reads dominant_label_1, then dominant_label_2, then dominant_label_3. That order is Vision's confidence rank: label detection is requested with maxResults 3, Vision returns the labels in descending confidence order, and the stored columns are not sorted again. The 
+
+confidence scores are not saved. A blank later column means Vision returned fewer than three labels. A word that is not a scene, such as Blue, Sky, Daytime, Cloud, or Happiness, is skipped. The first remaining label that sits on a scene list sets scene_category to City, Nature, Landmark, or Culture/People. A waterfront whose first real label is Water is Nature even when City appears later. has_urban_elements is true when any of the three labels is on the City list. has_natural_landmark is true when any label is on the Nature list or the Landmark list. A person or a crowd does not set that flag. A photo whose labels name no scene is Other. A photo with no labels keeps a blank scene_category and blank flags. 
+
+
+
+<!-- Start of picture text -->
+ag ail ii): oes ; ieee. : :<br>eee RR<br>| SO ae ‘ ae =<br>eater Bs na a ee cal, eS es<br>eReNhat « oe Mo Raeattre Fat eyCU eeCtig aeaae,<br>be es he un res ip : 1 ag Fier ge lg! eg”<br>Hi a fen Ei Pa. a<br><!-- End of picture text -->
+
+**Figure 11. How three labels become a scene** 
+
+The lists live in scenes.py and are applied to every kept photo. The process log states why each kept word is on its list and why each skipped word on the current sheet is on none of them. Three labels are the strongest Vision returned, and the scene stops at the first of them that names a scene. One label would miss the 449 photos whose first word is something like Blue or Sky and whose scene comes from a later label. Three labels already produce 331 
+
+photos that name more than one scene, which is what the two flags keep. A longer list would change those flags more often than it would change scene_category. The confidence scores were not saved, so stopping at three is not a numeric cutoff, and three was not compared with one label or with a longer list. representation_mismatch is an evaluation output only. It is set when the absolute City-share residual is at least 0.20, and it is not a model feature. 
+
+**Country universe.** Blank rows and aggregate groups in the World Bank files, such as World and regional totals, are dropped before the territory filter. Urbanization is the 2025 value of indicator SP.URB.TOTL.IN.ZS. Taiwan remains among the 196. The World Bank extract has no Taiwan value for that indicator, and the World Bank API returns none. The indicator’s source is the UN Population Division’s World Urbanization Prospects (United Nations, 2025), national definitions. Table A3 of the 2025 edition gives China, Taiwan Province of China a 2025 national-definition proportion urban of 78.9 percent.  That figure is written into the country table and the ten Taiwan image rows, with urban_year 2025, so Taiwan can appear in the urbanization charts and in the later mismatch comparison. It is not a World Bank row. The same publication's Degree of Urbanization cities share for Taiwan in 2025 is 78.1 percent, and that series is not used. The filled percent is not a classifier feature, and it is not being held back for a later modeling stage. 
+
+**Search names.** Each Google Images query uses the U.S. Department of State short-form country name. The department reserves the short form for ordinary reference and the long form for formal diplomatic use 5 FAH-1 H-1021 (U.S. Department of State, n.d.-b). The names are taken from the Independent States in the World list (U.S. Department of State, n.d.-a), using the local file IndependentStates_Dependencies_INRGGI_08102026.csv verified 10 August 2026. World Bank labels such as "Korea, Rep." and "Venezuela, RB" are administrative abbreviations, so they are retained as world_bank_name and are not sent to the search. Kosovo is matched from the State Department code XKS to the World Bank code XKX. Palestine is not on the independent-states list, so its query is Palestine. The short forms "Korea, South", "Korea, North", "Gambia, The", "Bahamas, The", and "Micronesia, Federated States of" are reordered into ordinary word order. The 
+
+Republic of the Congo is queried as "Republic of the Congo" rather than "Congo", because the source note limits that short form to this country and an unqualified Congo query mostly returns the Democratic Republic. The 10 August 2026 short form for NRU is Naoero, so the query is Naoero. The World Bank file used that same spelling; world_bank_name for that row is stored as Nauru. The Turkey query is Türkiye, and country_name is stored as Türkiye, because the short form Turkey returns the bird. The Jordan query is "Jordan country", because the short form returns the shoe; the displayed name stays Jordan. 
+
+
+
+<!-- Start of picture text -->
+Google rune toe &<br>@—~@-@~ 2— G-G—G-0— O— #- #- a- G- 8- =~<br><!-- End of picture text -->
+
+
+
+<!-- Start of picture text -->
+om( * ao— P atcrn.- —ai: 9oe fenceee=<br><!-- End of picture text -->
+
+**Figure 12. Turkey returns the bird** Google Images for "Turkey" beside "Türkiye." 
+
+
+
+<!-- Start of picture text -->
+Google so«dan x HQ &<br>| i _, ea |<br><!-- End of picture text -->
+
+
+
+<!-- Start of picture text -->
+Google soxsan county $20 &<br>e— m- G- @- @~ S~ S-O-8~ = Be<br>= Ms, =:<br>ee A ey<br><!-- End of picture text -->
+
+**Figure 13. Jordan returns the shoe** 
+
+**Missing-Value Treatment.** Stage 1 compared listwise deletion, most-frequent imputation, 
+
+and a no-label placeholder. The sheet was left intact. The comparison is in the modeling scores. 
+
+**Outlier Handling.** Unusual urban percentages, including city-states, stay in the table for the mismatch comparison. They are not model inputs, and they are not removed as outliers. 
+
+**Encoding.** The predictors are dominant_label_1, dominant_label_2, dominant_label_3, scene_category, has_urban_elements, and has_natural_landmark. Those categorical fields are encoded with one-hot encoding and, for comparison, ordinal encoding, and the effect on model performance is measured rather than assumed. region is country geography, so it is not encoded. 
+
+**Normalization/Standardization.** The scaling comparison runs after encoding, because ordinal encoding produces integers and logistic regression is sensitive to scale. The three settings are no scaling, min-max normalization, and standardization. The percent being scaled is not urbanization. actual_urban_population_pct is left out of every income model, not only this pass. Tree-based methods are scale-invariant; logistic regression is not. 
+
+**Feature Selection.** The predictors are the three Vision labels, scene_category, has_urban_elements, and has_natural_landmark. actual_urban_population_pct is left out of every income model, so a predicted income tier is not the disparity comparison: the tier never sees urbanization. The comparison is an OLS line of City share on the 2025 urban percent. The residual is the observed share minus the share the line predicts. The line is used because it puts the image mix against the urban percent directly. representation_mismatch is an evaluation output only. It is set when the absolute City-share residual is at least 0.20, and it is not a model feature. Training permutation importance for the two fitted models is recorded in the process log and in data/processed/modeling/model_results.csv. 
+
+## **4. Modeling** 
+
+**Tools and Environment.** All analysis was done in Python (3.14.4) using Jupyter Notebook (`main.ipynb`). Data handling used pandas (3.0.2; McKinney, 2010). Preprocessing, the three classifiers (`DecisionTreeClassifier`, `RandomForestClassifier`, `LogisticRegression`), grouped cross-validation (`StratifiedGroupKFold`), and permutation importance used scikit-learn (1.9.1; Pedregosa et al., 2011). The Spearman and Kruskal-Wallis checks used SciPy (1.18.1; Virtanen et al., 2020), and charts were drawn with matplotlib (3.11.2; Hunter, 2007). Image search and labeling used SerpApi and Google Cloud Vision, described under Data Sources. 
+
+**Algorithms.** Three classification algorithms are used: Decision Tree, Random Forest, and Logistic Regression (multinomial, for the four-tier target). 
+
+**Target Variables.** Two target framings are modeled and compared: the primary four-tier development_status classification, and the alternative binary-collapsed income_status_binary target. 
+
+**Data Partitioning.** The analysis set contains 196 countries and 1,960 photos, 10 photos for each country. Those countries are divided once, 80/20, into a training set and a held-out set. The cut is 
+
+stratified on the four-tier income label and uses random_state=42. A country's 10 photos stay together. The training set has 156 countries and 1,560 photos. The held-out set has 40 countries and 400 photos: 5 Low income, 10 Lower middle income, 12 Upper middle income, and 13 High income. The training countries are 20, 37, 47, and 52 in those same tiers. The held-out countries are reserved for the final score. 
+
+The 156 training countries are divided further into five groups by grouped 5-fold cross-validation (StratifiedGroupKFold, n_splits=5, shuffle=True, random_state=42). The group key is iso_code, and the groups are stratified on the four-tier label. They contain 31, 32, 31, 31, and 31 countries, which is 310, 320, 310, 310, and 310 photos. Each group includes every tier: 4 Low income countries in every group, 7 or 8 Lower middle income, 9 or 10 Upper middle income, and 10 or 11 High income. The binary target uses these same five groups. 
+
+A setting is one target, one missing-value treatment, one encoding, one scaling, one algorithm, and one hyperparameter choice. A fit is one training of that setting. In each fit, four groups are the training portion and the fifth group is scored. The training portion has 124 countries and 1,240 photos when the scored group is the group of 32, and 125 countries and 1,250 photos for each of the other groups. The fit sees the six image-content predictors and the income labels of the training portion, then assigns an income tier to each photo in the scored group. The fitted model is then discarded. Each training country is the scored group in one of the five fits and part of the training portion in the other four. The score of a fit is macro F1, the unweighted mean of the per-tier F1 scores. Settings are ranked by the mean of the five macro F1 scores. Imputation, encoding, and scaling are fit on that fit's training portion alone. The five groups rank settings while every income tier remains present in every scored group, and the 40 held-out countries stay unused until a setting has been chosen. 
+
+**Experimental Procedure.** Stage 1 compares preparations while the algorithms stay at their defaults: unlimited decision-tree depth, a minimum leaf size of 1, a random forest of 100 trees, and logistic regression with C equal to 1. Listwise deletion, most-frequent imputation, and a no-label 
+
+placeholder, crossed with one-hot and ordinal encoding and with unscaled values, min-max normalization, and standardization, make 18 preprocessors. Pairing each preprocessor with each of the three algorithms gives 54 settings for one target and 108 settings for the two targets. Each setting is fit on each of the five groups, which is 540 fits. This stage selects a preparation and an algorithm. 
+
+Stage 2 keeps, separately for each target and each algorithm, the stage-1 preprocessor with the highest mean macro F1. It then changes only that algorithm's hyperparameters. Decision-tree depth is 4, 8, or unlimited, and the minimum leaf size is 1 or 5, which is 6 settings. Depth is how many successive questions the tree may ask. The leaf size is the smallest number of photos a terminal answer may rest on. Random-forest depth is 8 or unlimited, with the same two leaf sizes, which is 4 settings, and the forest still has 100 trees. Logistic regression tries C of 0.1, 1, and 10, which is 3 settings. C is the inverse of the penalty that draws the coefficients toward zero, so a smaller value draws them harder. Each grid includes the default used in stage 1. The stage has 13 settings for one target, 26 settings for both targets, and 130 fits. Giving each of the 18 preprocessors every hyperparameter choice later tried for its algorithm would be 18 × 6 tree settings, 18 × 4 forest settings, and 18 × 3 logistic settings, or 234 settings for one target. Separating the stages keeps the preparation search and the hyperparameter search from multiplying. 
+
+For each target, the setting with the highest stage-2 mean macro F1 is trained on all 156 countries and scored once on the 400 held-out photos. 
+
+## **5. Evaluation** 
+
+**Performance Metrics.** Accuracy, precision (macro-averaged across income tiers), recall (macro-averaged), and F1-score (macro-averaged) are recorded for every setting in data/processed/modeling/model_results.csv. The four-tier winner's cross-validation accuracy is 0.351 and its held-out accuracy is 0.388. The binary winner's cross-validation accuracy is 0.694 and its held-out accuracy is 0.670. Settings are still ranked by macro F1. Held-out four-tier accuracy is 
+
+0.063 above a High-income majority baseline of 0.325, and held-out binary accuracy is 0.045 above a richer-group majority baseline of 0.625. Both lifts are small, and each held-out accuracy stays near its cross-validation accuracy. Of the 400 held-out four-tier predictions, 155 match the tier, 160 miss by one tier, and 85 miss by more than one. The four-tier tree's mean training macro F1 is 0.866 against a validation macro F1 of 0.336. The binary logistic gap is 0.171, from a mean training macro F1 of 0.801 to a validation macro F1 of 0.630. Those validation scores are the ones that rank the settings. 
+
+**Evaluation Procedure.** Models are compared primarily by macro-averaged F1-score, since this metric penalizes poor performance on any single class rather than allowing strong performance on majority classes to mask weak performance on minority classes, which is important given the dataset's income tiers are unlikely to be perfectly balanced. A confusion matrix for each chosen setting, and the importance chart, are in the modeling section of main.ipynb. Those figures stay in the notebook and will be exported as image files once the project is further along. 
+
+
+
+<!-- Start of picture text -->
+development status<br>Low income 9 17 17 ]<br>Lower middle income 14 22 33 31<br>Go<br>2<br>8s<br>7)<br>‘2<br>Upper middle income 14 16<br>High income 2 14 35 79<br>Low income Lower middle income Upper middle income High income<br>Predicted label<br><!-- End of picture text -->
+
+**Figure 14. Four-tier confusion matrix** 
+
+
+
+<!-- Start of picture text -->
+income status binary<br>Low or lower-middle<br>o<br>2<br>8<br>ow<br>2<br>Ee<br>High or upper-middle 218<br>Low or lower-middle High or upper-middle<br>Predicted label<br><!-- End of picture text -->
+
+**Figure 15. Binary confusion matrix** 
+
+
+
+<!-- Start of picture text -->
+development status income status binary<br>scene_category scene_category |<br>has_urban_elements has_natural_landmark |<br>has_natural_landmark has_urban_elements |<br>0.0 O21 0.2 0.3 0.4 0.00 0.02 0.04 0.06 0.08 0.10<br>Drop in training macro F1. Drop in training macro F1<br><!-- End of picture text -->
+
+**Figure 16. Permutation importance** 
+
+
+
+<!-- Start of picture text -->
+Neighboring-tier counts<br>160<br>140<br>w 120<br>F]<br>2£ 100<br>a<br>ra3 80<br>ao}= 60<br>x=<br>40<br>20<br>0<br>Correct Wrong by one tier Wrong by more than one<br><!-- End of picture text -->
+
+**Figure 17. Neighboring-tier counts** 
+
+On the 400 held-out photos, 155 four-tier predictions are the correct tier, 160 are wrong by one tier, and 85 are wrong by more than one tier. That count is in the process log. 
+
+The training-versus-validation gap was measured by refitting each winner on the same five grouped folds and scoring each fit on the photos it was trained on as well as on the held-out group. For the four-tier tree the mean training macro F1 is 0.866 and the mean validation macro F1 is 0.336, the published cross-validation score. The gap is 0.530. A refit on all 156 training countries scores macro F1 0.856 on those photos and 0.341 on the 400 held-out photos. For the binary logistic winner the mean training macro F1 is 0.801 and the mean validation macro F1 is 0.630. The gap is 0.171. A refit on all 156 training countries scores macro F1 0.791 on those photos and 0.599 on the holdout. The fold-by-fold scores are in the process log. Those validation scores are the ceiling of this search. The 108 settings were already ranked by the unseen-fold macro F1, so they do not need to be fit again: the other four-tier settings stay at or below 0.336, and the other binary settings stay at or below 0.630. 
+
+The lift stays small because the score is one photo and the income label belongs to the country. Ten 
+
+photos from one search can be a landscape, a street, and a landmark, and they share one tier. Nature is the largest scene in every tier: 37% of low-income photos, 54% of lower middle, 58% of upper middle, and 52% of high income. City share stays near 19% to 23% for the three groups below high income and reaches 30% for high income, while the 2025 urban medians are 34.5, 50.9, 65.4, and 79.7 percent. A landscape returned for a rich country and a landscape returned for a poor country often receive the same scene. Culture/People is the count that moves with income, from 31% of low-income photos to 5% of high-income photos. It is a minority in every tier, including 77 of 250 low-income photos. That gradient is too thin to assign four tiers. The binary model can use a split of that size, and it still finishes 0.045 above its own majority guess. The holdout repeats cross-validation. The four-tier settings sit between about 0.24 and 0.34, and changing the missing-value treatment, the encoding, or the scale leaves them in that band. A shallower tree scores about 0.19 to 0.22. The best forest scores 0.328 and the best four-tier logistic regression scores 0.334. The unlimited tree fits photos it has seen, at a training macro F1 of 0.866, and its score on a new country stays at 0.336. Search images do not reliably represent a country's income. 
+
+**Results.** Objective 2 compared missing-value treatments on the one-hot decision tree. Listwise deletion, most-frequent imputation, and the no-label placeholder score 0.332, 0.334, and 0.336. Objective 3 compared encoding and scaling. Ordinal encoding is the low end of the four-tier scores. Scaling leaves the tree and the forest unchanged. Objective 5 compared the four-tier target with the binary target against their majority-class baselines. Held-out four-tier accuracy is 0.388 against a High-income majority baseline of 0.325. Held-out binary accuracy is 0.670 against a richer-group majority baseline of 0.625. Objective 6 ranks image content by training permutation importance. On the four-tier tree, permuting a column drops macro F1 by 0.408 for dominant_label_1, 0.353 for dominant_label_2, 0.257 for dominant_label_3, and 0.186 for scene_category. The two flags move it by about 0.03. On the binary model the three labels move it by 0.110, 0.074, and 0.055, and the scene and the flags move it by about 0.002. 
+
+**Mismatch Evaluation.** Beyond standard classification metrics, the study separately evaluates 
+
+representational mismatch: for each country, City share is the fraction of its 10 photos labeled City, and OLS line relates that share to the 2025 urban percent. The residual is the observed share minus the share the line predicts. Countries are ranked by the absolute residual. The 0.20 cutoff is two photos out of ten, since City share moves in steps of 0.10. The signed residuals have a mean of 0 and a standard deviation of 0.196, so the cutoff is about one standard deviation from that mean. A gap inside that spread is the ordinary scatter around the line. Half a standard deviation is about 0.10, one photo, and that gap stays inside the scatter. Two standard deviations is about 0.39, roughly four photos, already past the ordinary scatter. The cutoff is the boundary of that scatter. The standard deviation is measured on these same 196 residuals, and the cutoff is not a significance level. The predicted income tier is stored with the ranking and does not set representation_mismatch. The residuals record how far City share sits from the line. They do not establish a specific causal mechanism. 
+
+**Mismatch Results.** An OLS line is fit to all 196 countries, City share on the 2025 urban percent. The slope is 0.002923 City-share per urban percentage point, and the intercept is 0.062747. The rank correlation of the signed residual with the four-tier income order is -0.045. The Spearman check is the chance of a correlation this far from zero if there is no link, and that chance is 0.530. A Kruskal-Wallis test compares the four group averages, and its p-value is 0.137. These checks are about the income averages. The mean signed residual is 0.057 for low income, -0.023 for lower middle income, -0.021 for upper middle income, and 0.013 for high income. The residual is not meaningfully related to income in this sample. Sixty-three countries fall more than 0.20 away from the trend line, about one standard deviation of these residuals (0.196), with 36 showing more City imagery than the line predicts and 27 showing less. Of those 63, 44 have an absolute residual under 0.30, two or three photos out of ten, and those gaps sit inside the ordinary wobble of a ten-photo share, while the countries at the top of each list sit further out. The 0.20 cutoff stays a description of this sheet, and it is not a significance test. The ten largest residuals on each side of the line are below. 
+
+
+
+<!-- Start of picture text -->
+City share against the 2025 urban percent<br>1.0 @ Within 0.20<br>@ = More City than the line<br>@ Fewer City than the line e<br>208 e<br>Oo<br>3 eee e ee<br>2 0.6 e eco eee 8<br>$s e ee ewe e<br>Zo e ee ee e @e @ eco @®@ee<br>2 e ce @ ee ce @ e0000@ eee ee<br>E02 e e @ ee eee emeee @ oo e<br>@eee eceo@ecs © OB Mewmeeoo @eeee<br>0.0 ecmeo cee ee © ee eece coe oe 8 Ce e e<br>20 40 60 80 100<br>Urban population, percent<br><!-- End of picture text -->
+
+**Figure 18. City share against the 2025 urban percent** 
+
+
+
+<!-- Start of picture text -->
+Signed residual by income tier<br>0.06<br>0.05<br>w 0.04<br>><br>3s<br>3 0.03<br>B 0.02<br>5<br>0.01<br>2<br>E 0.00<br>-0.01<br>—0.02<br>Low Lower middle Upper middle High<br><!-- End of picture text -->
+
+**Figure 19. Signed residual by income tier** 
+
+The ten countries with more City photos than the line predicts: 
+
+|**Country**||**Urban %**|**City share**|**Residual**|**Income**|**tier**|
+|---|---|---|---|---|---|---|
+|Cameroon||55.7|0.8|+0.575|Lower<br>income|middle|
+|Qatar||99.4|0.9|+0.547|High inc|ome|
+|Azerbaijan||58.6|0.7|+0.466|Upper<br>income|middle|
+|Poland||60.1|0.7|+0.462|High inc|ome|
+|Nigeria||63.8|0.7|+0.451|Lower<br>income|middle|
+|Estonia||70.7|0.7|+0.431|High inc|ome|
+|Taiwan||78.9|0.7|+0.407|High inc|ome|
+|Kosovo||50.9|0.6|+0.388|Upper|middle|
+||||||income||
+|United|Arab|86.0|0.7|+0.386|High inc|ome|
+|Emirates|||||||
+|Belgium||87.7|0.7|+0.381|High inc|ome|
+
+
+
+The ten countries with fewer City photos than the line predicts: 
+
+|**Country**|**Urban %**|**City share**|**Residual**|**Income tier**|
+|---|---|---|---|---|
+|Naoero|100.0|0.0|-0.355|High income|
+
+
+
+|**Country**|**Urban %**|**City share**|**Residual**|**Income**|**tier**|
+|---|---|---|---|---|---|
+|Iceland|94.2|0.0|-0.338|High inc|ome|
+|Switzerland|85.7|0.0|-0.313|High inc|ome|
+|Norway|83.6|0.0|-0.307|High inc|ome|
+|Palau|79.3|0.0|-0.295|High inc|ome|
+|Marshall Islands|79.1|0.0|-0.294|Upper|middle|
+|||||income||
+|Brunei|75.0|0.0|-0.282|High inc|ome|
+|Dominica|74.0|0.0|-0.279|Upper|middle|
+|||||income||
+|Djibouti|73.0|0.0|-0.276|Lower<br>income|middle|
+|Iraq|69.9|0.0|-0.267|Upper<br>income|middle|
+
+
+
+**Limitations.** The images were collected on 23 October 2026. The SerpApi call in collect.py sets the language parameter hl to en and does not set a location parameter. Two free-tier SerpApi accounts were used, and each account allows 250 searches. Why a second account was opened, and how collection changed from a fixed pull of 40 images to requesting results until 10 pass the filter, is in the Dataset paragraph above. Rankings can change between runs. The sampling depth of 10 was not tested for sensitivity. The holdout has 40 countries, 5 of them low income, so the scores are noisy, and no confidence intervals were computed. The 0.20 cutoff is about one standard deviation of these same 196 residuals, the residuals that fall at least that far from the line. 
+
+## **6. Deployment** 
+
+The prototype is the static page `data/processed/lookup/index.html`, written by `python lookup.py`. Open the file directly. It reads the ranking, the scene counts, and the recorded permutation importance. It does not call SerpApi or Cloud Vision, and it does not refit a model. A search filters the ranking, and a row selects a country. The country panel shows the 2025 urban percent, the World Bank income group, the scene counts, City share, the expected City share from the urbanization line, the signed residual, and whether the absolute residual is at least 0.20. 
+
+
+
+<!-- Start of picture text -->
+GIRD country lookup<br>63 countries are atleast 0.20 from the urbanization line, 36 above it and 27 below. The score is the signed residual.<br>Predicted income tier is withheld here. This page reports image content against urbanization only, not model predictions. © At least 0.20 above ® Atleast 0.20 below ® Under 0.20<br>country Cameroon<br>Cameroon Urban percent 55.7%<br>7 4. Income group Lower middle income<br>2 Qatar +0.547 0 Scene counts cityNature 8°<br>3 Azerbaijan +0.466 mLandmak 0<br>4 Poland +0.462 1 Culture/People 2<br>Counts are out of 10 photos.<br>5 Nigeria +0.451 City share 08<br>6 Estonia +0.431 Expected City share 0.225<br>TTawan +0407 (romSignedurbanizationresidual tine) +0575<br>8 Kosovo +0.388 Mismatch410 photos; small countries’ shares areAtmore leastvolatile 0.20 fromper  thephoto,line, two photos out of ten. City share moves in steps of 0.10,<br>9 United Arab Emirates +0.386<br>10 Belgium +0.381<br>411 Naoero -0.355<br><!-- End of picture text -->
+
+**Figure 20. Lookup page, Cameroon selected** 
+
+
+
+<!-- Start of picture text -->
+GIRD country lookup<br>63 countries are atleast 0.20 from the urbanization line, 36 above it and 27 below. The score is the signed residual<br>Predicted income tier is withheld here. This page reports image content against urbanization only, not model predictions. © At least 0.20 above ® Atleast 0.20 below ® Under 0.20<br>country Naoero<br>Cameroon Urban percent 100.0%<br>10 — Income group High income<br>2 Qatarameroon+0.547 @ Scene counts aNatureCity 07<br>M Landmark 0<br>3 Azerbaijan +0.466 1 Culture/People 2<br>4 Poland +0.462 Other 1<br>Counts are out of 10 photos.<br>5 Nigeria +0.451 City share 00<br>6 Estonia +0.431 Expected City share 0.355<br>1 Taiwananwan ++0407 (fromSigned urbanizationresidual line) 0.355<br>8 Kosovo +0.388 Mismatch ‘Atleast 0.20 from the line, two photos out often. City share moves in steps of 0.10.<br>410 photos; small countries’ shares are more volatile per photo,<br>9 United Arab Emirates +0.386<br>10 Belgium +0.381<br><!-- End of picture text -->
+
+**Figure 21. Lookup page, Naoero selected** 
+
+The same page lists all 196 countries by absolute residual, marks the 63 countries that fall at least 0.20 from the line, and lists the permutation drops. Those drops are from training photos and are not the mismatch score. A larger drop means the model used that feature more. The page says the predicted income tier is withheld. The page is a demonstration for reviewers, so they can open the countries named in Objective 7, rather than a production system. The ranked list and the feature summary in this note stay as written, as does the discussion of limitations regarding causal claims. 
+
+## **References** 
+
+- Huang, J., Huang, J., Liu, Z., Liu, X., Wang, W., & Zhao, J. (2025). AI sees your location—but with a bias toward the wealthy world. In Proceedings of the 2025 Conference on Empirical Methods in Natural Language Processing (pp. 18019–18039). 
+
+Association for Computational Linguistics. 
+
+<u>https://aclanthology.org/2025.emnlp-main.910</u> 
+
+Hunter, J. D. (2007). Matplotlib: A 2D graphics environment. *Computing in Science & Engineering, 9*(3), 90–95. <u>https://doi.org/10.1109/MCSE.2007.55</u>
+
+McKinney, W. (2010). Data structures for statistical computing in Python. In S. van der Walt & J. Millman (Eds.), *Proceedings of the 9th Python in Science Conference* (pp. 56–61). <u>https://doi.org/10.25080/Majora-92bf1922-00a</u>
+
+Pedregosa, F., Varoquaux, G., Gramfort, A., Michel, V., Thirion, B., Grisel, O., Blondel, M., Prettenhofer, P., Weiss, R., Dubourg, V., Vanderplas, J., Passos, A., Cournapeau, D., Brucher, M., Perrot, M., & Duchesnay, E. (2011). Scikit-learn: Machine learning in Python. *Journal of Machine Learning Research, 12*, 2825–2830. <u>https://jmlr.org/papers/v12/pedregosa11a.html</u>
+
+United Nations, Department of Economic and Social Affairs, Population Division. (2025). World urbanization prospects: The 2025 revision. https://population.un.org/wup/ 
+
+U.S. Department of State. (n.d.). Independent states in the world. <u>https://www.state.gov/independent-states-in-the-world</u> 
+
+- U.S. Department of State. (n.d.). 5 FAH-1 H-1021: Treatment of geographic names. <u>https://fam.state.gov/FAM/05FAH01/05FAH011020.html</u> 
+
+Virtanen, P., Gommers, R., Oliphant, T. E., Haberland, M., Reddy, T., Cournapeau, D., Burovski, E., Peterson, P., Weckesser, W., Bright, J., van der Walt, S. J., Brett, M., Wilson, J., Millman, K. J., Mayorov, N., Nelson, A. R. J., Jones, E., Kern, R., Larson, E., ... SciPy 1.0 Contributors. (2020). SciPy 1.0: Fundamental algorithms for scientific computing in Python. *Nature Methods, 17*(3), 261–272. <u>https://doi.org/10.1038/s41592-019-0686-2</u>
+
+World Bank. (n.d.). Country and lending groups. <u>https://datahelpdesk.worldbank.org/knowledgebase/articles/906519</u> 
+
+World Bank. (n.d.). Urban population (% of total population) [Indicator SP.URB.TOTL.IN.ZS]. https://data.worldbank.org/indicator/SP.URB.TOTL.IN.ZS 
+
+**Appendix A: Repository and File Index** 
+
+- Repository: https://github.com/joshuafrellte/google-image-representation-model.git 
+
+- Country/image tables: data/processed/countries.csv, data/processed/images.csv 
+
+- Model scores: data/processed/modeling/model_results.csv 
+
+- Mismatch ranking: data/processed/modeling/mismatch_ranking.csv 
+
+- Lookup prototype: data/processed/lookup/index.html 
+
+- Collection scripts: collect_all.py, scenes.py, lookup.py 
+
+- Environment: Python 3.14.4, pandas 3.0.2, scikit-learn 1.9.1, SciPy 1.18.1, matplotlib 3.11.2 
+
